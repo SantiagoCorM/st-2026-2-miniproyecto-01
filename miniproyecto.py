@@ -33,22 +33,26 @@ RESULTADOS.mkdir(exist_ok=True)
 # Cambie estos cuatro datos por los de la serie del grupo y documente la
 # fuente en datos/README.md. La serie de ejemplo solo sirve para probar que
 # el guion corre.
-ARCHIVO = "datos/air_passengers.csv"
+ARCHIVO = "datos/precipitacion_florencia.csv"
 FECHA = "Month"
-VALOR = "#Passengers"
+VALOR = "PRECTOTCORR"
 PERIODO = 12
 
 # Lo que se hizo con los huecos y con los datos atípicos, en una línea. Va
 # a la columna `decision` de la tabla de métricas.
-DECISION = "TODO: describa aquí la decisión sobre huecos y datos atípicos"
-
+DECISION = "No se identificaron valores faltantes. Se detectaron 5 posibles valores atípicos mediante IQR, pero se conservaron por no existir evidencia de errores de medición."
 
 def preparar(serie):
-    """TODO: aplique la decisión del grupo sobre huecos y datos atípicos.
+    """Prepara la serie conservando los valores originales.
 
-    Por ejemplo, interpolar los meses vacíos o recortar el tramo afectado.
-    Debe devolver una serie sin NaN.
+    No se identificaron valores faltantes en la descarga.
+    Los posibles valores extremos se conservarán inicialmente,
+    hasta evaluar si corresponden a eventos reales o errores.
     """
+    serie = serie.copy()
+
+    assert serie.notna().all(), "La serie contiene valores faltantes."
+
     return serie
 
 

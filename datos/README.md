@@ -1,22 +1,36 @@
-# datos
+# Datos del proyecto
 
-La serie del grupo va en esta carpeta, en CSV. Llene esta ficha y borre la
-serie de ejemplo cuando ya no la use.
+## Descripción de la serie
 
-| Campo | Valor |
-|---|---|
-| Archivo | {{nombre del CSV}} |
-| Qué mide | {{...}} |
-| Fuente | {{institución o conjunto de datos, con enlace}} |
-| Licencia | {{...}} |
-| Frecuencia | mensual |
-| Periodo | {{primer mes}} a {{último mes}} ({{n}} observaciones) |
-| Columna de fecha | {{...}} |
-| Columna que se pronostica | {{...}} |
+La serie utilizada corresponde a la precipitación atmosférica estimada para Florencia, Caquetá, Colombia. Los datos fueron obtenidos mediante la API de NASA POWER, utilizando el parámetro `PRECTOTCORR` de la comunidad Agroclimatology (AG).V
 
-## Serie de ejemplo
+## Ficha técnica
 
-`air_passengers.csv`: pasajeros mensuales de una aerolínea entre 1949 y 1960,
-la serie clásica de Box y Jenkins, tomada de Kaggle
-(`rakannimer/air-passengers`). Solo sirve para comprobar que el guion corre;
-el miniproyecto se hace con la serie del grupo.
+| Campo | Descripción |
+|:---|:---|
+| **Archivo** | `precipitacion_florencia.csv` |
+| **Qué mide** | Tasa media de precipitación corregida, expresada en mm/día. |
+| **Fuente** | [NASA POWER – Prediction of Worldwide Energy Resources](https://power.larc.nasa.gov/) |
+| **Documentación** | [API temporal mensual](https://power.larc.nasa.gov/docs/services/api/temporal/monthly/) |
+| **Licencia** | Creative Commons Attribution 4.0 International (CC BY 4.0). |
+| **Frecuencia** | Mensual. |
+| **Periodo** | Enero de 2001 – diciembre de 2025. |
+| **Observaciones** | 300 registros mensuales. |
+| **Columna de fecha** | `Month` |
+| **Variable pronosticada** | `PRECTOTCORR` |
+
+## Ubicación geográfica
+
+- **Municipio:** Florencia, Caquetá, Colombia.
+- **Latitud:** 1.6144°.
+- **Longitud:** -75.6062°.
+
+## Características de los datos
+
+- Fuente meteorológica: NASA POWER.
+- Producto de datos: MERRA-2.
+- Parámetro: `PRECTOTCORR` (Precipitation Corrected).
+- Unidad: milímetros por día (mm/day).
+- Registros faltantes: 0.
+- Frecuencia temporal: mensual.
+
