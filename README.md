@@ -22,16 +22,11 @@ en `datos/README.md`.
 
 ## Integrantes
 
-Los grupos son de 3 integrantes.
-
-Esta tabla identifica al grupo. Sin ella, o con algún dato incompleto, la
-entrega pierde el 20 %; quien no aparezca aquí no cuenta como parte del grupo.
+El proyecto es desarrollado individualmente, sujeto a la autorización del docente.
 
 | Nombre completo | Código | Correo institucional |
 |---|---|---|
-| | | |
-| | | |
-| | | |
+| Santiago Cortés Murcia | 22601912 | santiago.cortns@uao.edu.co |
 
 ## Entrega
 
