@@ -111,12 +111,92 @@ def descomponer(serie):
 # ============================================================
 
 def estacionariedad(serie):
-    """TODO: ADF sobre la serie, su diferencia regular, la estacional y las dos.
+    """Evalúa estacionariedad mediante ADF e identifica d y D."""
 
-    Imprima el valor p de cada versión, elija d y D, y guarde la ACF y la
-    PACF de la serie elegida en figuras/acf_pacf.png. Devuelva (d, D).
-    """
-    raise NotImplementedError("estacionariedad, ACF y PACF")
+    from statsmodels.tsa.stattools import adfuller
+    from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+
+    # Cuatro versiones de la serie
+    versiones = {
+        "Original": serie,
+        "Diferencia regular": serie.diff().dropna(),
+        "Diferencia estacional": serie.diff(PERIODO).dropna(),
+        "Regular + estacional": serie.diff().diff(PERIODO).dropna()
+    }
+
+    print("\nPRUEBAS DE ESTACIONARIEDAD ADF")
+    print("-" * 55)
+
+    resultados = {}
+
+    for nombre, datos in versiones.items():
+        prueba = adfuller(datos, regression="c", autolag="AIC")
+        estadistico = prueba[0]
+        pvalor = prueba[1]
+
+        resultados[nombre] = pvalor
+
+        print(f"{nombre}:")
+        print(f"  Estadístico ADF: {estadistico:.4f}")
+        print(f"  Valor p: {pvalor:.6f}")
+        print(f"  Resultado: {'Estacionaria' if pvalor < 0.05 else 'No estacionaria'}")
+
+    # Selección inicial de diferenciación:
+    # se busca la combinación más sencilla que alcance p < 0.05.
+    candidatos = [
+        (0, 0, "Original"),
+        (1, 0, "Diferencia regular"),
+        (0, 1, "Diferencia estacional"),
+        (1, 1, "Regular + estacional")
+    ]
+
+    elegidos = [
+        (d, D, nombre)
+        for d, D, nombre in candidatos
+        if resultados[nombre] < 0.05
+    ]
+
+    if not elegidos:
+        raise ValueError(
+            "Ninguna versión alcanzó estacionariedad según ADF."
+        )
+
+    # En caso de empate, se prioriza la diferenciación estacional.
+    d, D, nombre = min(
+        elegidos,
+        key=lambda x: (x[0] + x[1], -x[1])
+    )
+
+    print("\nDECISIÓN INICIAL")
+    print(f"Serie seleccionada: {nombre}")
+    print(f"d = {d}")
+    print(f"D = {D}")
+
+    # Aplicar las diferencias seleccionadas
+    seleccionada = serie.copy()
+
+    if d == 1:
+        seleccionada = seleccionada.diff()
+
+    if D == 1:
+        seleccionada = seleccionada.diff(PERIODO)
+
+    seleccionada = seleccionada.dropna()
+
+    # ACF y PACF
+    fig, axes = plt.subplots(2, 1, figsize=(12, 8))
+
+    plot_acf(seleccionada, lags=36, ax=axes[0])
+    axes[0].set_title("Función de autocorrelación (ACF)")
+
+    plot_pacf(seleccionada, lags=36, method="ywm", ax=axes[1])
+    axes[1].set_title("Función de autocorrelación parcial (PACF)")
+
+    plt.tight_layout()
+    plt.savefig("figuras/acf_pacf.png", dpi=300, bbox_inches="tight")
+    plt.close()
+
+    return d, D
 
 
 # ============================================================
