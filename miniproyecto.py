@@ -71,8 +71,39 @@ def graficar_serie(serie):
 # ============================================================
 
 def descomponer(serie):
-    """TODO: STL robusta con el periodo de la serie; guarde figuras/stl.png."""
-    raise NotImplementedError("descomposición STL")
+    """Descomposición STL robusta con periodo de 12 meses."""
+
+    from statsmodels.tsa.seasonal import STL
+
+    resultado = STL(
+        serie,
+        period=PERIODO,
+        robust=True
+    ).fit()
+
+    fig, axes = plt.subplots(4, 1, figsize=(12, 10), sharex=True)
+
+    axes[0].plot(serie)
+    axes[0].set_title("Serie original")
+    axes[0].set_ylabel("mm/día")
+
+    axes[1].plot(resultado.trend)
+    axes[1].set_title("Tendencia")
+    axes[1].set_ylabel("mm/día")
+
+    axes[2].plot(resultado.seasonal)
+    axes[2].set_title("Componente estacional")
+    axes[2].set_ylabel("mm/día")
+
+    axes[3].plot(resultado.resid)
+    axes[3].set_title("Residuo")
+    axes[3].set_ylabel("mm/día")
+
+    plt.tight_layout()
+    plt.savefig("figuras/stl.png", dpi=300, bbox_inches="tight")
+    plt.close()
+
+    return resultado
 
 
 # ============================================================
