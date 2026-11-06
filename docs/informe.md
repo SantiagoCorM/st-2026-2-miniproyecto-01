@@ -205,11 +205,11 @@ $$
 
 La ecuación del modelo, expresada mediante el operador de rezago $B$, es:
 
-$$
+```math
 (1-\phi_1 B)(1-\Phi_1 B^{12})y_t
 =
 c+(1+\theta_1 B)(1+\Theta_1 B^{12})\varepsilon_t
-$$
+```
 
 Donde $\phi_1$ y $\Phi_1$ representan los parámetros autorregresivos regular y estacional, respectivamente; $\theta_1$ y $\Theta_1$ representan los parámetros de media móvil regular y estacional; $c$ es la constante y $\varepsilon_t$ es el término de error.
 
