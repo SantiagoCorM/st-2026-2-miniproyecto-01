@@ -1,3 +1,5 @@
 modelo,decision,RMSE,MAE,MAPE
+"SARIMAX(1, 0, 1)(1, 0, 1, 12) + exógenas","No se identificaron valores faltantes. Se detectaron 5 posibles valores atípicos mediante IQR, pero se conservaron por no existir evidencia de errores de medición.",2.99,2.19,42.57
+"SARIMA(1, 0, 1)(1, 0, 1, 12)","No se identificaron valores faltantes. Se detectaron 5 posibles valores atípicos mediante IQR, pero se conservaron por no existir evidencia de errores de medición.",3.01,2.13,36.96
 estacional ingenuo,"No se identificaron valores faltantes. Se detectaron 5 posibles valores atípicos mediante IQR, pero se conservaron por no existir evidencia de errores de medición.",3.23,2.28,40.53
 ingenuo,"No se identificaron valores faltantes. Se detectaron 5 posibles valores atípicos mediante IQR, pero se conservaron por no existir evidencia de errores de medición.",4.09,3.38,86.96

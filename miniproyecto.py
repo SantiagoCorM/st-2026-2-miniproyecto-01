@@ -206,36 +206,151 @@ def estacionariedad(serie):
 # pronósticos y solo usa `entrenamiento`. Así entra al backtest común.
 
 def elegir_sarima(serie, d, D):
-    """TODO: rejilla pequeña de órdenes (p, q, P, Q) comparada por AIC.
+    """Selecciona SARIMA mediante AIC y evalúa sus residuos."""
+    from statsmodels.tsa.statespace.sarimax import SARIMAX
+    from statsmodels.stats.diagnostic import acorr_ljungbox
+    import itertools
 
-    Ajuste con toda la serie preparada, imprima la tabla de AIC, revise los
-    residuos del elegido con Ljung-Box y guarde figuras/residuos.png.
-    Devuelva el orden y el orden estacional elegidos.
-    """
-    raise NotImplementedError("selección del SARIMA")
+    resultados = []
+
+    # Rejilla pequeña: p, q, P y Q entre 0 y 1.
+    combinaciones = list(itertools.product([0, 1], repeat=4))
+
+    for p, q, P, Q in combinaciones:
+        orden = (p, d, q)
+        orden_estacional = (P, D, Q, PERIODO)
+
+        try:
+            ajuste = SARIMAX(
+                serie,
+                order=orden,
+                seasonal_order=orden_estacional,
+                enforce_stationarity=False,
+                enforce_invertibility=False
+            ).fit(disp=False, maxiter=200)
+
+            resultados.append({
+                "orden": orden,
+                "orden_estacional": orden_estacional,
+                "AIC": ajuste.aic
+            })
+
+        except Exception as error:
+            print(f"Modelo {orden} x {orden_estacional} no ajustado: {error}")
+
+    if not resultados:
+        raise ValueError("No fue posible ajustar ningún modelo SARIMA.")
+
+    tabla = pd.DataFrame(resultados).sort_values("AIC")
+
+    print("\nCOMPARACIÓN DE MODELOS SARIMA")
+    print(tabla.to_string(index=False))
+
+    mejor = tabla.iloc[0]
+    orden = mejor["orden"]
+    orden_estacional = mejor["orden_estacional"]
+
+    print("\nMEJOR MODELO SARIMA")
+    print(f"Orden: {orden}")
+    print(f"Orden estacional: {orden_estacional}")
+    print(f"AIC: {mejor['AIC']:.4f}")
+
+    # Ajustar el mejor modelo para analizar sus residuos.
+    ajuste = SARIMAX(
+        serie,
+        order=orden,
+        seasonal_order=orden_estacional,
+        enforce_stationarity=False,
+        enforce_invertibility=False
+    ).fit(disp=False, maxiter=200)
+
+    residuos = ajuste.resid.dropna()
+
+    print("\nPRUEBA DE LJUNG-BOX")
+    ljung_box = acorr_ljungbox(
+        residuos,
+        lags=[12, 24],
+        return_df=True
+    )
+    print(ljung_box)
+
+    fig, axes = plt.subplots(2, 1, figsize=(12, 8))
+
+    axes[0].plot(residuos)
+    axes[0].set_title("Residuos del mejor modelo SARIMA")
+    axes[0].set_ylabel("Residuo")
+
+    axes[1].hist(residuos, bins=30)
+    axes[1].set_title("Distribución de los residuos")
+    axes[1].set_xlabel("Residuo")
+
+    plt.tight_layout()
+    plt.savefig("figuras/residuos.png", dpi=300, bbox_inches="tight")
+    plt.close()
+
+    return orden, orden_estacional
 
 
 def modelo_sarima(orden, orden_estacional):
-    """TODO: devuelva la función modelo(entrenamiento, h) del SARIMA elegido."""
-    raise NotImplementedError("SARIMA en el backtest")
+    """Devuelve un modelo SARIMA compatible con el backtest."""
+    from statsmodels.tsa.statespace.sarimax import SARIMAX
+
+    def modelo(entrenamiento, h):
+        ajuste = SARIMAX(
+            entrenamiento,
+            order=orden,
+            seasonal_order=orden_estacional,
+            enforce_stationarity=False,
+            enforce_invertibility=False
+        ).fit(disp=False, maxiter=200)
+
+        pronostico = ajuste.forecast(steps=h)
+        return pronostico.to_numpy()
+
+    return modelo
 
 
 def exogenas(serie):
-    """TODO: DataFrame de variables conocidas de antemano, con el índice de la serie.
+    """Genera variables exógenas conocidas para cada mes."""
+    fechas = pd.date_range(
+        start=serie.index.min(),
+        end=serie.index.max() + pd.DateOffset(months=12),
+        freq="MS"
+    )
 
-    Por ejemplo, el número de festivos o de días hábiles de cada mes. Debe
-    cubrir también los 12 meses que siguen al final de la serie.
-    """
-    raise NotImplementedError("variables exógenas")
+    x = pd.DataFrame(index=fechas)
+    x["dias_mes"] = x.index.days_in_month
+
+    return x
 
 
 def modelo_sarimax(orden, orden_estacional, x):
-    """TODO: devuelva modelo(entrenamiento, h) de un SARIMAX con exógenas x.
+    """Devuelve un modelo SARIMAX compatible con el backtest."""
+    from statsmodels.tsa.statespace.sarimax import SARIMAX
 
-    Use x.loc[entrenamiento.index] para ajustar y
-    x.loc[fechas_siguientes(entrenamiento, h)] para pronosticar.
-    """
-    raise NotImplementedError("SARIMAX en el backtest")
+    def modelo(entrenamiento, h):
+        fechas_futuras = fechas_siguientes(entrenamiento, h)
+
+        x_entrenamiento = x.loc[entrenamiento.index]
+        x_futuro = x.loc[fechas_futuras]
+
+        ajuste = SARIMAX(
+            entrenamiento,
+            exog=x_entrenamiento,
+            order=orden,
+            seasonal_order=orden_estacional,
+            enforce_stationarity=False,
+            enforce_invertibility=False
+        ).fit(disp=False, maxiter=200)
+
+        pronostico = ajuste.get_forecast(
+            steps=h,
+            exog=x_futuro
+        ).predicted_mean
+
+        return pronostico.to_numpy()
+
+    return modelo
 
 
 # ============================================================
