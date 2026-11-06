@@ -267,8 +267,6 @@ En consecuencia, aunque el SARIMAX presentó el menor RMSE, el SARIMA obtuvo mej
 
 ## 6. Tabla de métricas
 
-## 6. Tabla de métricas
-
 Los resultados de la evaluación se presentan ordenados de menor a mayor RMSE. Se comparan las dos líneas base (ingenuo y estacional ingenuo) con los modelos SARIMA y SARIMAX. La columna decisión registra el tratamiento aplicado a los datos antes del modelado.
 
 | Modelo | Decisión | RMSE | MAE | MAPE (%) |

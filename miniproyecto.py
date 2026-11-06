@@ -402,7 +402,7 @@ def main():
             pendiente("parte 4", error)
 
     tabla = pd.DataFrame(filas).sort_values("RMSE")
-    tabla.to_csv(RESULTADOS / "metricas.csv", index=False)
+    tabla.to_csv(RESULTADOS / "metricas.csv", index=False, encoding="utf-8-sig")
     print(tabla.drop(columns="decision").to_string(index=False))
     print("Mejor modelo por RMSE:", tabla.iloc[0]["modelo"])
 
